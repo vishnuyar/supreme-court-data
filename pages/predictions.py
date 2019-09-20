@@ -1,12 +1,121 @@
 from dash.dependencies import Input, Output
 import dash_core_components as dcc
+import dash_bootstrap_components as dbc
 import dash_html_components as html
+from datetime import datetime as dt
 
 from joblib import load
 import numpy as np
 import pandas as pd
 
 from app import app
+
+state_dict = {
+        -1:'Not Applicable',
+            1: 'Alabama',
+        2: 'Alaska',
+        3: 'American Samoa',
+        4: 'Arizona',
+        5: 'Arkansas',
+        6: 'California',
+        7: 'Colorado',
+        8: 'Connecticut',
+        9: 'Delaware',
+        10: 'District of Columbia',
+        11: 'Federated States of Micronesia',
+        12: 'Florida',
+        13: 'Georgia',
+        14: 'Guam',
+        15: 'Hawaii',
+        16: 'Idaho',
+        17: 'Illinois',
+        18: 'Indiana',
+        19: 'Iowa',
+        20: 'Kansas',
+        21: 'Kentucky',
+        22: 'Louisiana',
+        23: 'Maine',
+        24: 'Marshall Islands',
+        25: 'Maryland',
+        26: 'Massachusetts',
+        27: 'Michigan',
+        28: 'Minnesota',
+        29: 'Mississippi',
+        30: 'Missouri',
+        31: 'Montana',
+        32: 'Nebraska',
+        33: 'Nevada',
+        34: 'New Hampshire',
+        35: 'New Jersey',
+        36: 'New Mexico',
+        37: 'New York',
+        38: 'North Carolina',
+        39: 'North Dakota',
+        40: 'Northern Mariana Islands',
+        41: 'Ohio',
+        42: 'Oklahoma',
+        43: 'Oregon',
+        44: 'Palau',
+        45: 'Pennsylvania',
+        46: 'Puerto Rico',
+        47: 'Rhode Island',
+        48: 'South Carolina',
+        49: 'South Dakota',
+        50: 'Tennessee',
+        51: 'Texas',
+        52: 'Utah',
+        53: 'Vermont',
+        54: 'Virgin Islands',
+        55: 'Virginia',
+        56: 'Washington',
+        57: 'West Virginia',
+        58: 'Wisconsin',
+        59: 'Wyoming',
+        60: 'United States',
+        61: 'Interstate Compact',
+        62: 'Philippines',
+        63: 'Indian',
+        64: 'Dakota'
+        }
+
+court_dict = {
+    
+        -1: 'Not Applicable',
+        48: 'California Central U.S. District Court',
+        50: 'California Northern U.S. District Court',
+        51: 'California Southern U.S. District Court',
+        55: 'District Of Columbia U.S. District Court',
+        58: 'Florida Southern U.S. District Court',
+        66: 'Illinois Northern U.S. District Court',
+        75: 'Louisiana Eastern U.S. District Court',
+        80: 'Massachusetts U.S. District Court',
+        81: 'Michigan Eastern U.S. District Court',
+        92: 'New Jersey U.S. District Court',
+        94: 'New York Eastern U.S. District Court',
+        96: 'New York Southern U.S. District Court',
+        109: 'Pennsylvania Eastern U.S. District Court',
+        301: 'State Appellate Court',
+        300: 'State Supreme Court',
+        302: 'State Trial Court',
+        121: 'Texas Southern U.S. District Court',
+        32: 'U.S. Court of Appeals, District of Columbia',
+        28: 'U.S. Court of Appeals, Eighth Circuit',
+        31: 'U.S. Court of Appeals, Eleventh Circuit',
+        8: 'U.S. Court of Appeals, Federal Circuit',
+        25: 'U.S. Court of Appeals, Fifth Circuit',
+        21: 'U.S. Court of Appeals, First Circuit',
+        24: 'U.S. Court of Appeals, Fourth Circuit',
+        29: 'U.S. Court of Appeals, Ninth Circuit',
+        22: 'U.S. Court of Appeals, Second Circuit',
+        27: 'U.S. Court of Appeals, Seventh Circuit',
+        26: 'U.S. Court of Appeals, Sixth Circuit',
+        30: 'U.S. Court of Appeals, Tenth Circuit',
+        23: 'U.S. Court of Appeals, Third Circuit',
+        3: 'U.S. Court of Claims, Court of Federal Claims',
+        9: 'U.S. Tax Court',
+        126: 'Virginia Eastern U.S. District Court',
+        9999:'Other Courts'
+                                }
 
 lc_disposition_dict={1:'stay, petition, or motion granted',
                             2:'affirmed',
@@ -64,7 +173,7 @@ parties_category = {28: 'State',
                  382: 'Labor Board',
                  195: 'Owner',
                  240: 'Taxpayer',
-                 -1: 'Others'}
+                 9999: 'Others'}
 
 style = {'padding': '1.5em'}
 
@@ -75,30 +184,252 @@ layout = html.Div([
         Use the controls below to update your latest case status details.
     
     """), 
+    dbc.Row([
+        dbc.Col(
+          html.Div([
+        dcc.Markdown('###### Cert Reason'), 
+        dcc.Dropdown(
+            id='cert_dict', 
+            options=[{'label': cert_labels_dict[key], 'value': key} for key in cert_labels_dict], 
+            value=1
+        ), 
+    ], style=style),
+        ),
 
-    html.Div(id='prediction-content', style={'fontWeight':'bold'}), 
+        dbc.Col(
+               html.Div([
+        dcc.Markdown('###### Issue Area'), 
+        dcc.Dropdown(
+            id='issue_dict', 
+            options=[{'label': issue_areas_dict[key], 'value': key} for key in issue_areas_dict], 
+            value=1
+        ), 
+    ], style=style),
 
-    html.Div([
-        dcc.Markdown('###### Are you'), 
+        ),
+
+    ]),
+
+    dbc.Row([
+        dbc.Col(
+            html.Div([
+            dcc.Markdown('###### Petitioner Category'), 
+            dcc.Dropdown(
+                id='petitioner_category', 
+                options=[{'label': parties_category[key], 'value': key} for key in parties_category], 
+                value=28
+            ), 
+            ], style=style),
+        ),
+
+        dbc.Col(
+            html.Div([
+            dcc.Markdown('###### Petitioner State'), 
+            dcc.Dropdown(
+                id='petitioner_state', 
+                options=[{'label': state_dict[key], 'value': key} for key in state_dict], 
+                value=-1
+            ), 
+            ], style=style),
+        ),
+
+    ]),
+
+    dbc.Row([
+        dbc.Col(
+            html.Div([
+            dcc.Markdown('###### Respondent Category'), 
+            dcc.Dropdown(
+                id='respondent_category', 
+                options=[{'label': parties_category[key], 'value': key} for key in parties_category], 
+                value=28
+            ), 
+            ], style=style),
+        ),
+
+        dbc.Col(
+            html.Div([
+            dcc.Markdown('###### Respondent State'), 
+            dcc.Dropdown(
+                id='respondent_state', 
+                options=[{'label': state_dict[key], 'value': key} for key in state_dict], 
+                value=-1
+            ), 
+            ], style=style),
+        ),
+
+    ]),
+
+    dbc.Row([
+             dbc.Col(
+             html.Div([
+                dcc.Markdown('###### Lower Court Decision'), 
+                dcc.Dropdown(
+                    id='cert_dict', 
+                    options=[{'label': lc_disposition_dict[key], 'value': key} for key in lc_disposition_dict], 
+                    value=1
+                ), 
+    ], style=style),
+            ),
+
+        dbc.Col(
+               html.Div([
+        dcc.Markdown('###### Dissent in Lower Court decision'), 
       dcc.RadioItems(
     options=[
-        {'label': 'Petitioner', 'value': '0'},
-        {'label': 'Respondent', 'value': '1'},
+        {'label': 'Yes', 'value': '1'},
+        {'label': 'No', 'value': '0'},
         
     ],
     value='1'
 ), 
-    ], style=style), 
+    ], style=style),
+        ),
+
+    ]),
+
+    dbc.Row([
+        dbc.Col(
+            html.Div([
+            dcc.Markdown('###### Lower Court'), 
+            dcc.Dropdown(
+                id='case_source', 
+                options=[{'label': court_dict[key], 'value': key} for key in court_dict], 
+                value=28
+            ), 
+            ], style=style),
+        ),
+
+        dbc.Col(
+            html.Div([
+                dcc.Markdown('###### Lower Court State'), 
+                dcc.Dropdown(
+                    id='lowercourt_state', 
+                    options=[{'label': state_dict[key], 'value': key} for key in state_dict], 
+                    value=-1
+                ), 
+            ], style=style),
+        ),
 
    
-    html.Div([
-        dcc.Markdown('###### Petitioner Category'), 
-        dcc.Dropdown(
-            id='petition_category', 
-            options=[{'label': parties_category[key], 'value': key} for key in parties_category], 
-            value=28
-        ), 
+
+    ]),
+
+        dbc.Row([
+        dbc.Col(
+            html.Div([
+            dcc.Markdown('###### Case Origin'), 
+            dcc.Dropdown(
+                id='case_origin', 
+                options=[{'label': court_dict[key], 'value': key} for key in court_dict], 
+                value=28
+            ), 
+            ], style=style),
+        ),
+
+        dbc.Col(
+            html.Div([
+                dcc.Markdown('###### Case Origin State'), 
+                dcc.Dropdown(
+                    id='case_origin_state', 
+                    options=[{'label': state_dict[key], 'value': key} for key in state_dict], 
+                    value=-1
+                ), 
+            ], style=style),
+        ),
+
+]),
+
+            dbc.Row([
+        dbc.Col(
+          html.Div([
+        dcc.Markdown('###### Argument Completed'), 
+             dcc.RadioItems(
+                id='is_argument',
+    options=[
+        {'label': 'Yes', 'value': '1'},
+        {'label': 'No', 'value': '0'},
+        
+    ],
+    value='0'
+), 
     ], style=style),
+        ),
+
+        dbc.Col(
+               html.Div([
+        dcc.Markdown('###### Argument Date'), 
+        html.Div([
+    dcc.DatePickerSingle(
+        id='argument_date',
+        min_date_allowed=dt(1995, 8, 5),
+        max_date_allowed=dt(2025, 9, 19),
+        initial_visible_month=dt(2019, 8, 5),
+        date=str(dt(2019, 8, 25, 23, 59, 59))
+    ),
+    html.Div(id='output-argument_date')
+]) 
+    ], style=style),
+
+        ),
+
+    ]),
+
+                        dbc.Row([
+        dbc.Col(
+          html.Div([
+        dcc.Markdown('###### Re Argument Completed'), 
+             dcc.RadioItems(
+                id='is_reargument',
+    options=[
+        {'label': 'Yes', 'value': '1'},
+        {'label': 'No', 'value': '0'},
+        
+    ],
+    value='0'
+), 
+    ], style=style),
+        ),
+
+        dbc.Col(
+               html.Div([
+        dcc.Markdown('###### Re Argument Date'), 
+        html.Div([
+    dcc.DatePickerSingle(
+        id='reargument_date',
+        min_date_allowed=dt(1995, 8, 5),
+        max_date_allowed=dt(2025, 9, 19),
+        initial_visible_month=dt(2019, 8, 5),
+        date=str(dt(2019, 8, 25, 23, 59, 59))
+    ),
+    html.Div(id='output-reargument_date')
+]) 
+    ], style=style),
+
+        ),
+
+    ]),
+
+ html.Div([
+                dcc.Markdown('###### Adminstraion action prior to litigation'), 
+                dcc.Dropdown(
+                    id='case_origin_state', 
+                    options=[{'label': 'Not Applicable', 'value': 0},
+                    {'label': 'Federal Agency', 'value': 1},
+                    {'label': 'State Agency', 'value': 2},], 
+                    value=-1
+                ), 
+            ], style=style),
+
+
+
+
+    html.Div(id='prediction-content', style={'fontWeight':'bold'}), 
+
+ 
+
+   
+    
 
      html.Div([
         dcc.Markdown('###### Respondent Category'), 
@@ -109,32 +440,10 @@ layout = html.Div([
         ), 
     ], style=style),
 
-     html.Div([
-        dcc.Markdown('###### Issue Area'), 
-        dcc.Dropdown(
-            id='issue_dict', 
-            options=[{'label': issue_areas_dict[key], 'value': key} for key in issue_areas_dict], 
-            value=1
-        ), 
-    ], style=style),
+  
+    
 
-     html.Div([
-        dcc.Markdown('###### Cert Reason'), 
-        dcc.Dropdown(
-            id='cert_dict', 
-            options=[{'label': cert_labels_dict[key], 'value': key} for key in cert_labels_dict], 
-            value=1
-        ), 
-    ], style=style),
-
-     html.Div([
-        dcc.Markdown('###### Lower Court Decision'), 
-        dcc.Dropdown(
-            id='cert_dict', 
-            options=[{'label': lc_disposition_dict[key], 'value': key} for key in lc_disposition_dict], 
-            value=1
-        ), 
-    ], style=style),
+    
 
     html.Div([
         dcc.Markdown('###### Monthly Debts'), 

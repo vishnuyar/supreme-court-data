@@ -35,7 +35,7 @@ column1 = dbc.Col(
 
             This system built using state of art Machine learning algorithms uses data available uptil the date of decision.
 
-            Based on data available from 1946 till 2018, the model can predict outcome with 66.2% accuracy.
+            Based on data available from 1946 till 2018, the model can predict outcome with 67.4% accuracy.
 
             """
         ),

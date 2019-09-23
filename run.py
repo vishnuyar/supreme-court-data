@@ -29,14 +29,15 @@ navbar = dbc.NavbarSimple(
     brand='Supreme Justice',
     brand_href='/', 
     children=[
+        dbc.NavItem(dcc.Link('Home', href='/', className='nav-link')),
         dbc.NavItem(dcc.Link('Predictions', href='/predictions', className='nav-link')), 
-        dbc.NavItem(dcc.Link('Insights', href='/insights', className='nav-link')), 
+        #dbc.NavItem(dcc.Link('Insights', href='/insights', className='nav-link')), 
         dbc.NavItem(dcc.Link('Process', href='/process', className='nav-link')), 
     ],
     sticky='top',
-    # color='#333', 
-    # light=True, 
-    # dark=False
+    color='#333', 
+    light=False, 
+    dark=True
 )
 
 footer = dbc.Container(

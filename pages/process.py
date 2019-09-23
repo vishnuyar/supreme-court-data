@@ -31,15 +31,13 @@ dataset = dbc.Row(
             The data consists of 8966 court cases. The earliest court case decision is from November 1946 and the latest is from June 2019. 
             Some of the variables in the dataset are
 
-            **certReason**: The reason Supreme Court has taken this case. (Sometimes no reason is given)
 
-            **Petitioner:** Type of Petitioner ( eg. Employee, Owner, State Govt)
 
-            **Respondent:** Type of Respondent ( eg. Employeer, Tenant, US Govt)
-            
-            **Issue Area:** Issue pertaining to the case (similar issues are clubeed into 14 different Issue areas)
-            
-            **Lower Court:** Court whose decision the Supreme Court reviews
+            **certReason**: The reason Supreme Court has taken this case. (Sometimes no reason is given)  
+            **Petitioner:** Type of Petitioner ( eg. Employee, Owner, State Govt)  
+            **Respondent:** Type of Respondent ( eg. Employeer, Tenant, US Govt)              
+            **Issue Area:** Issue pertaining to the case (similar issues are clubeed into 14 different Issue areas)              
+            **Lower Court:** Court whose decision the Supreme Court reviews  
 
         """
  )]
@@ -63,12 +61,11 @@ prediction_target = dbc.Row(
     dcc.Markdown(
         """
  
-            ### Prediction
+            #### Prediction
 
 
-            We are trying to predict the outcome of a case from a petitioner perspective. 
+            We are trying to predict the outcome of a case from a petitioner perspective.
             If the petitioner wins the case, then the model predicts the outcome as 1.  
-
             They are 16 cases in the dataset where the outcome of petitioner is unspecifiable,
              these cases have been removed from the dataset.
         """
@@ -87,7 +84,9 @@ classification_models = dbc.Row(
 
             #### Baseline
 
-            Before building the model, we will look at the baseline prediction with majority class.
+            Before building the model, we will looked at the baseline prediction with majority class.  The baseline prediction is **63.4%** for a favorable outcome for the petitioner.  
+            As this is a high accuracy, we decided to go for the the AUC ROC metric for measuring the performance of the model.  
+            The baseline for AUC ROC metric is **50%**
 
             #### Test and Validation sets
 
@@ -97,23 +96,31 @@ classification_models = dbc.Row(
 
             After considering various algorithms such as DecisionTreeClassifier, RandomForestClassifier, LGBMClassifier, gradient boosting XGBClassifier gave the best metric performance.
 
-            This model's ROC AUC score was 66.2%
+            This model's ROC AUC score was 65.5%
 
         """
     )]
 )
 
-
+graphnames = dbc.Row([
+    dbc.Col(
+        html.Div('ROC Curve area',style={'text-align': 'center','font-size':16,'font-weight':'bold'})
+    ),
+    dbc.Col(
+        html.Div('Confusion Matrix',style={'text-align': 'center','font-size':16,'font-weight':'bold'})
+    )
+    
+])
 roccurve = dbc.Row([
     dbc.Col(
-        [
+        
     html.Img(src='/assets/roccurve.png',style={'width':'100%','height':'69%'})
 
-    ]),
-    dbc.Col([
+    ),
+    dbc.Col(
         html.Img(src='/assets/confusion_matrix_fig.png',style={'width':'100%'})
 
-        ]
+        
 
         )]
     
@@ -141,12 +148,10 @@ featureimportance = dbc.Row([
         #### Feature Importance explained
 
         The reason why Supreme Court takes up the case is the most important feature followed by 
-        the Lower court ruling. Even though it makes sense from our understanding that Supreme Court 
-        wouldn't take up case unless if they feel that the case in dispute has significant ramifications.
-        The model has picked up the same.
-        
-
-        
+        the Lower court ruling. From my understanding Supreme Court would take up a case only if they
+        feel that the case in dispute has significant ramifications. 
+        This model has picked up important feautres which seem to resonate with common knowledge
+        The model has picked up the same.        
 
         """
 
@@ -159,10 +164,7 @@ partialplot_heading = dbc.Row(
     [
     dcc.Markdown(
         """ 
-            ### Partial Plot for Argued Since
-
-
-           
+            #### Partial Plots           
         """
     )]
 )
@@ -181,12 +183,20 @@ partialplot_heading = dbc.Row(
 #     )]
 # )
 
-partialplot = dbc.Row(
-    [
-    html.Img(src='/assets/partialplot.png',style={'width':'100%'})
+partialplot = dbc.Row([
+    # dbc.Col(
+    #     html.Img(src='/assets/partialplot_interaction.png',style={'width':'100%','height':'100%'})
+    #     ),
+    dbc.Col(
+        html.Img(src='/assets/partialplot_issuearea.png',style={'width':'90%','height':'100%'})
+        ),
+    dbc.Col(
+        html.Img(src='/assets/partialplot_certreason.png',style={'width':'90%','height':'100%'})
+        )
+       
 
-    ]
-)
+    
+    ])
 
 
 partialplot_writeup = dbc.Row(
@@ -269,6 +279,7 @@ column_list = [introduction,
                 assumptions,
                 prediction_target,
                 classification_models,
+                graphnames,
                 roccurve,
                 model_interpreation,
                 featureimportance,

@@ -181,18 +181,20 @@ parties_category = {28: 'State',
 
 style = {'padding': '1.5em'}
 
-
+empty_col = dbc.Col(
+    html.Div(id='prediction-content_values'),
+    md=2
+    )
 output_col = dbc.Col([
-    dbc.Row(
-        html.Div(id='prediction-content_values')
-        ),
-    dbc.Row(
+    # dbc.Col(
+    #     html.Div(id='prediction-content_values')
+    #     ),
+    dbc.Col(
         html.Div(                
             dcc.Graph(id='prediction-content'),
-            style={"position": "fixed"})
+            style={"position": "fixed",'width':'40%','height':'20%'})
         )
-    ],
-    md=4            
+    ]#,md=3           
 )
 
 input_col = dbc.Col([
@@ -456,7 +458,7 @@ input_col = dbc.Col([
     Input( 'issueArea', 'value'),
     Input( 'caseSource', 'value')
      ])
-def predict(petitioner, case_argued, lcDisposition, respondent, 
+def send_outcomes(petitioner, case_argued, lcDisposition, respondent, 
     certReason, caseOriginState, petitionerState, lcDisagreement, respondentState,
      caseSourceState, issueArea, caseSource):
     predict_data = pd.DataFrame(
@@ -493,7 +495,7 @@ def predict(petitioner, case_argued, lcDisposition, respondent,
     Input( 'issueArea', 'value'),
     Input( 'caseSource', 'value')
      ])
-def predict(petitioner, case_argued, lcDisposition, respondent, 
+def send_piechart(petitioner, case_argued, lcDisposition, respondent, 
     certReason, caseOriginState, petitionerState, lcDisagreement, respondentState,
      caseSourceState, issueArea, caseSource):
     predict_data = pd.DataFrame(
@@ -508,7 +510,11 @@ def predict(petitioner, case_argued, lcDisposition, respondent,
     y_proba = xgboost.predict_proba(predict_data)[:,1][0]
     favorable_outcome = 100*y_proba
     unfavorable_outcome = 100 - favorable_outcome
-    graphdata = go.Pie(values=[favorable_outcome,unfavorable_outcome])
+    colors=['ForestGreen','Crimson']
+    graphdata = go.Pie(values=[favorable_outcome,unfavorable_outcome],
+        labels=['Favorable','Unfavorable'],
+        marker=dict(colors=colors, line=dict(color='#000000', width=1)),
+        title=('Outcome Probability'))
     return {'data': [graphdata]}
 
 layout = dbc.Row([

@@ -12,7 +12,12 @@ import pandas as pd
 from app import app
 
 from joblib import load
+#Loading the xgboost model
 xgboost = load('assets/xgboost.joblib')
+#Features used by the model
+selected_features=['caseSource', 'caseOriginState', 'respondent', 'lcDisagreement',
+ 'issueArea', 'case_reargued', 'case_argued', 'lcDisposition', 'respondentState', 'caseSourceState',
+  'threeJudgeFdc', 'petitioner', 'is_adminAction', 'certReason', 'petitionerState']
 
 state_dict = {
         -1:'Not Applicable',
@@ -121,32 +126,32 @@ court_dict = {
         9999:'Other Courts'
                                 }
 
-lc_disposition_dict={1:'stay, petition, or motion granted',
-                            2:'affirmed',
-                            3:'reversed',
-                            4:'reversed and remanded',
-                            5:'vacated and remanded',
-                            6:'affirmed and reversed (or vacated) in part',
-                            7:'affirmed and reversed (or vacated) in part and remanded',
-                            8:'vacated',
-                            9:'petition denied or appeal dismissed',
-                            10:'modify',
-                            11:'remand',
-                            12:'unusual disposition'}
+lc_disposition_dict={1:'Stay Granted',
+                            2:'Affirmed',
+                            3:'Reversed',
+                            4:'Reversed and Remanded',
+                            5:'Vacated and Remanded',
+                            6:'Affirmed and Reversed in part',
+                            7:'Affirmed and Remanded in part',
+                            8:'Vacated',
+                            9:'Appeal Dismissed',
+                            10:'Modify',
+                            11:'Remand',
+                            12:'Unusual decision'}
 
-cert_labels_dict={1: 'case did not arise on cert or cert not granted',
-                     2: 'federal court conflict',
-                     3: 'federal court conflict and to resolve important or significant question',
-                     4: 'putative conflict',
-                     5: 'conflict between federal court and state court',
-                     6: 'state court conflict',
-                     7: 'federal court confusion or uncertainty',
-                     8: 'state court confusion or uncertainty',
-                     9: 'federal court and state court confusion or uncertainty',
-                     10: 'to resolve important or significant question',
-                     11: 'to resolve question presented',
-                     12: 'no reason given',
-                     13: 'other reason'}
+cert_labels_dict={1: 'Cert not granted',
+                     2: 'Federal court conflict',
+                     3: 'Federal court and important question',
+                     4: 'Putative conflict',
+                     5: 'Conflict between Federal and State',
+                     6: 'State court conflict',
+                     7: 'Federal court uncertainty',
+                     8: 'state court uncertainty',
+                     9: 'Federal and State uncertainty',
+                     10: 'To resolve important question',
+                     11: 'To resolve question presented',
+                     12: 'No Reason Given',
+                     13: 'Other reason'}
 
 issue_areas_dict = {1: 'Criminal Procedure',
                      2: 'Civil Rights',
@@ -162,7 +167,7 @@ issue_areas_dict = {1: 'Criminal Procedure',
                      12: 'Federal Taxation',
                      13: 'Miscellaneous',
                      14: 'Private Action'}
-parties_category = {28: 'State',
+parties_category = {28: 'State Government',
                  27: 'United States',
                  100: 'Person accused of crime',
                  126: 'Person convicted of crime',
@@ -170,7 +175,7 @@ parties_category = {28: 'State',
                  145: 'Employee',
                  151: 'Employer',
                  249: 'Union',
-                 8: 'Governmental employee or job applicant',
+                 8: 'Governmental Employee',
                  3: 'City,Town or Govt Unit',
                  106: 'Alien',
                  215: 'Prisoner',
@@ -214,7 +219,11 @@ input_col = dbc.Col([
                 id='certReason', 
                 options=[{'label': cert_labels_dict[key], 'value': key} for key in cert_labels_dict], 
                 value=1
-                ), 
+                ),
+                dbc.Tooltip(
+                        "Select the reason Supreme Court gives to grant the petition",
+            target="certReason",
+        ), 
             ], style=style),
         ),
 
@@ -225,7 +234,11 @@ input_col = dbc.Col([
                     id='issueArea', 
                     options=[{'label': issue_areas_dict[key], 'value': key} for key in issue_areas_dict], 
                     value=1
-                ), 
+                ),
+                dbc.Tooltip(
+                        "Select the Issue area, this case comes under",
+            target="issueArea",
+        ), 
             ], style=style),
 
         ),
@@ -239,8 +252,12 @@ input_col = dbc.Col([
                 dcc.Dropdown(
                     id='petitioner', 
                     options=[{'label': parties_category[key], 'value': key} for key in parties_category], 
-                    value=28
-                ), 
+                    value=27
+                ),
+                dbc.Tooltip(
+                    "Petitoner: The one who approaches the Supreme Court",
+                target="petitioner",
+        ), 
             ], style=style),
         ),
 
@@ -251,7 +268,11 @@ input_col = dbc.Col([
                     id='petitionerState', 
                     options=[{'label': state_dict[key], 'value': key} for key in state_dict], 
                     value=-1
-                ), 
+                ),
+                dbc.Tooltip(
+                    "The State petitioner belongs to: Not Applicable if US Govt is the petitioner",
+                target="petitionerState",
+        ), 
             ], style=style),
         ),
 
@@ -266,6 +287,10 @@ input_col = dbc.Col([
                     options=[{'label': parties_category[key], 'value': key} for key in parties_category], 
                     value=28
                 ), 
+                dbc.Tooltip(
+                    "The party against whom the petition has been filed by the Petitioner",
+                target="respondent",
+        ),
             ], style=style),
         ),
 
@@ -276,7 +301,11 @@ input_col = dbc.Col([
                     id='respondentState', 
                     options=[{'label': state_dict[key], 'value': key} for key in state_dict], 
                     value=-1
-                ), 
+                ),
+                dbc.Tooltip(
+                    "The State respondent belongs to: Not Applicable if US Govt is the respondent",
+                target="respondentState",
+        ), 
             ], style=style),
         ),
 
@@ -290,7 +319,12 @@ input_col = dbc.Col([
                     id='lcDisposition', 
                     options=[{'label': lc_disposition_dict[key], 'value': key} for key in lc_disposition_dict], 
                     value=1
-                ), 
+                ),
+                dbc.Tooltip(
+                    "Lower Court Decision : The decision which the Petitioner has approached the Supreme Court to review",
+                target="lcDisposition",
+        ),
+
             ], style=style),
         ),
         dbc.Col(
@@ -300,8 +334,12 @@ input_col = dbc.Col([
                     id='lcDisagreement',
                     options=[{'label': 'Yes', 'value': 1},
                             {'label': 'No', 'value': 0},],
-                    value=1
-                ), 
+                    value=0
+                ),
+                dbc.Tooltip(
+                    "Dissent is applicable only when the Lower Court decision is not unanimous",
+                target="lcDisagreement",
+        ), 
             ], style=style),
         ),
 
@@ -315,7 +353,11 @@ input_col = dbc.Col([
                     id='caseSource', 
                     options=[{'label': court_dict[key], 'value': key} for key in court_dict], 
                     value=28
-                ), 
+                ),
+                dbc.Tooltip(
+                    "The name of the Lower Court",
+                target="caseSource",
+        ), 
             ], style=style),
         ),
 
@@ -326,7 +368,11 @@ input_col = dbc.Col([
                     id='caseSourceState', 
                     options=[{'label': state_dict[key], 'value': key} for key in state_dict], 
                     value=-1
-                ), 
+                ),
+                dbc.Tooltip(
+                    "Applicable : only when the Lower Court is a State Court",
+                target="caseSourceState",
+        ), 
             ], style=style),
         ),
     ]),
@@ -334,13 +380,18 @@ input_col = dbc.Col([
     dbc.Row([
         dbc.Col(
             html.Div([
-                dcc.Markdown('###### Case Origin'), 
+                dcc.Markdown('###### Case Origin Court'), 
                 dcc.Dropdown(
                     id='caseOrigin', 
                     options=[{'label': court_dict[key], 'value': key} for key in court_dict], 
                     value=28
                 ), 
+                dbc.Tooltip(
+                    "Court in which the case originated, Not Trial Court either a state or federal appellate court",
+                target="caseOrigin",
+        ),
             ], style=style),
+            
         ),
         dbc.Col(
             html.Div([
@@ -349,7 +400,11 @@ input_col = dbc.Col([
                     id='caseOriginState', 
                     options=[{'label': state_dict[key], 'value': key} for key in state_dict], 
                     value=-1
-                ), 
+                ),
+                dbc.Tooltip(
+                    "Applicable : only when the case Origin Court is a State Court",
+                target="caseOriginState",
+        ), 
             ], style=style),
         ),
     ]),
@@ -368,29 +423,13 @@ input_col = dbc.Col([
                     ],
                     value=0
                 ), 
+                dbc.Tooltip(
+                    "Select if Oral Arguments have been heard by the Supreme Court",
+                target="case_argued",
+        ),
             ], style=style),
         ),
 
-        dbc.Col(
-            html.Div([
-                dcc.Markdown('###### Argument Date'), 
-                html.Div([
-                    dcc.DatePickerSingle(
-                        id='argument_date',
-                        min_date_allowed=dt(1995, 8, 5),
-                        max_date_allowed=dt(2025, 9, 19),
-                        initial_visible_month=dt(2019, 8, 5),
-                        date=str(dt(2019, 8, 25, 23, 59, 59))
-                    ),
-                html.Div(id='output-argument_date')
-                ]) 
-            ], style=style),
-
-        ),
-
-    ]),
-
-    dbc.Row([
         dbc.Col(
             html.Div([
                 dcc.Markdown('###### Re Argument Completed'), 
@@ -401,27 +440,15 @@ input_col = dbc.Col([
                     {'label': 'No', 'value': 0},
 
                     ],
-                    value='0'
-                    ), 
+                    value=0
+                    ),
+                 dbc.Tooltip(
+                    "Rarely : Supreme Court asks Oral Arguments to be presented again.",
+                target="case_reargued",
+        ),
                 ], style=style),
             ),
-
-        dbc.Col(
-            html.Div([
-                dcc.Markdown('###### Re Argument Date'), 
-                html.Div([
-                    dcc.DatePickerSingle(
-                        id='reargument_date',
-                        min_date_allowed=dt(1995, 8, 5),
-                        max_date_allowed=dt(2025, 9, 19),
-                        initial_visible_month=dt(2019, 8, 5),
-                        date=str(dt(2019, 8, 25, 23, 59, 59))
-                        ),
-                    html.Div(id='output-reargument_date')
-                    ]) 
-            ], style=style),
-
-        ),
+        
 
     ]),
 
@@ -429,22 +456,47 @@ input_col = dbc.Col([
         dbc.Col(
             html.Div([
                 dcc.Markdown('###### Adminstraion action prior to litigation'), 
-                dcc.Dropdown(
+                dcc.RadioItems(
                     id='is_adminAction', 
                     options=[{'label': 'Not Applicable', 'value': 0},
                     {'label': 'Federal Agency', 'value': 1},
-                    {'label': 'State Agency', 'value': 2},], 
-                    value=-1
-                ), 
+                    ], 
+                    value=0
+                ),
+                dbc.Tooltip(
+                    "Applicable only if there is Administrative activity prior"
+                    "to onset of Litigation  "
+                    "Note Administrative action is taken by either a State or Federal Agency",
+                target="is_adminAction",
+        ), 
             ], style=style),
-        )
+        ),
+        dbc.Col(
+            html.Div([
+                dcc.Markdown('###### Three Judge Court'), 
+                dcc.RadioItems(
+                    id='threeJudgeFdc',
+                    options=[
+                    {'label': 'Yes', 'value': 1},
+                    {'label': 'No', 'value': 0},
+
+                    ],
+                    value=0
+                    ),
+                 dbc.Tooltip(
+                    "Is the case being heard by Three Judge Court ?",
+                target="threeJudgeFdc",
+        ),
+                ], style=style),
+            ),
     ])
 
-    ])
+    ],md=7
+    )
 
 @app.callback(
     Output('prediction-content_values', 'children'),
-    [#Input('threeJudgeFdc', 'value'),
+    [Input('threeJudgeFdc', 'value'),
     Input( 'petitioner', 'value'),
     Input( 'case_argued', 'value'),
     Input( 'lcDisposition', 'value'),
@@ -456,21 +508,22 @@ input_col = dbc.Col([
     Input( 'respondentState', 'value'),
     Input( 'caseSourceState', 'value'),
     Input( 'issueArea', 'value'),
-    Input( 'caseSource', 'value')
+    Input( 'caseSource', 'value'),
+    Input( 'is_adminAction', 'value'),
+    Input( 'case_reargued', 'value'),
      ])
-def send_outcomes(petitioner, case_argued, lcDisposition, respondent, 
+def send_outcomes(threeJudgeFdc,petitioner, case_argued, lcDisposition, respondent, 
     certReason, caseOriginState, petitionerState, lcDisagreement, respondentState,
-     caseSourceState, issueArea, caseSource):
+     caseSourceState, issueArea, caseSource,is_adminAction,case_reargued):
     predict_data = pd.DataFrame(
     columns = ['threeJudgeFdc', 'petitioner', 'case_argued', 'lcDisposition', 'respondent', 
         'certReason', 'caseOriginState', 'petitionerState', 'lcDisagreement', 'respondentState',
-         'caseSourceState', 'issueArea', 'caseSource'],
-    #Hard coding threejudgefdc, need to get the input later
-    data = [[1, petitioner, case_argued, lcDisposition, respondent, 
+         'caseSourceState', 'issueArea', 'caseSource','is_adminAction','case_reargued'],
+    data = [[threeJudgeFdc, petitioner, case_argued, lcDisposition, respondent, 
         certReason, caseOriginState, petitionerState, lcDisagreement, respondentState,
-         caseSourceState, issueArea, caseSource]]
+         caseSourceState, issueArea, caseSource,is_adminAction,case_reargued]]
          )
-    y_proba = xgboost.predict_proba(predict_data)[:,1][0]
+    y_proba = xgboost.predict_proba(predict_dataselected_features)[:,1][0]
     favorable_outcome = 100*y_proba
     unfavorable_outcome = 100 - favorable_outcome
     graphdata = go.Pie(values=[favorable_outcome,unfavorable_outcome])
@@ -481,7 +534,7 @@ def send_outcomes(petitioner, case_argued, lcDisposition, respondent,
 
 @app.callback(
     Output('prediction-content', 'figure'),
-    [#Input('threeJudgeFdc', 'value'),
+    [Input('threeJudgeFdc', 'value'),
     Input( 'petitioner', 'value'),
     Input( 'case_argued', 'value'),
     Input( 'lcDisposition', 'value'),
@@ -493,21 +546,22 @@ def send_outcomes(petitioner, case_argued, lcDisposition, respondent,
     Input( 'respondentState', 'value'),
     Input( 'caseSourceState', 'value'),
     Input( 'issueArea', 'value'),
-    Input( 'caseSource', 'value')
+    Input( 'caseSource', 'value'),
+    Input( 'is_adminAction', 'value'),
+    Input( 'case_reargued', 'value'),
      ])
-def send_piechart(petitioner, case_argued, lcDisposition, respondent, 
+def send_piechart(threeJudgeFdc,petitioner, case_argued, lcDisposition, respondent, 
     certReason, caseOriginState, petitionerState, lcDisagreement, respondentState,
-     caseSourceState, issueArea, caseSource):
+     caseSourceState, issueArea, caseSource,is_adminAction,case_reargued):
     predict_data = pd.DataFrame(
     columns = ['threeJudgeFdc', 'petitioner', 'case_argued', 'lcDisposition', 'respondent', 
         'certReason', 'caseOriginState', 'petitionerState', 'lcDisagreement', 'respondentState',
-         'caseSourceState', 'issueArea', 'caseSource'],
-    #Hard coding threejudgefdc, need to get the input later
-    data = [[1, petitioner, case_argued, lcDisposition, respondent, 
+         'caseSourceState', 'issueArea', 'caseSource','is_adminAction','case_reargued'],
+    data = [[threeJudgeFdc, petitioner, case_argued, lcDisposition, respondent, 
         certReason, caseOriginState, petitionerState, lcDisagreement, respondentState,
-         caseSourceState, issueArea, caseSource]]
+         caseSourceState, issueArea, caseSource,is_adminAction,case_reargued]]
          )
-    y_proba = xgboost.predict_proba(predict_data)[:,1][0]
+    y_proba = xgboost.predict_proba(predict_data[selected_features])[:,1][0]
     favorable_outcome = 100*y_proba
     unfavorable_outcome = 100 - favorable_outcome
     colors=['ForestGreen','Crimson']
@@ -516,31 +570,8 @@ def send_piechart(petitioner, case_argued, lcDisposition, respondent,
         marker=dict(colors=colors, line=dict(color='#000000', width=1)),
         title=('Outcome Probability'))
     return {'data': [graphdata]}
+    
 
 layout = dbc.Row([
     input_col,output_col
     ]) 
-# layout = html.Div([
-#     dcc.Markdown("""
-#         ### Predict
-
-#         Use the controls below to update your latest case status details.
-    
-#     """),
-#     dbc.Row([output_col,input_col])
-    
-    
-# #html.Div(id='prediction-content', style={'fontWeight':'bold'}), 
-# ])
-
-
-    # df = pd.DataFrame(
-    #     columns=['Annual Income', 'Credit Score', 'Loan Amount', 'Loan Purpose', 'Monthly Debts'], 
-    #     data=[[annual_income, credit_score, loan_amount, loan_purpose, monthly_debts]]
-    # )
-
-    # pipeline = load('model/pipeline.joblib')
-    # y_pred_log = pipeline.predict(df)
-    # y_pred = np.expm1(y_pred_log)[0]
-
-    # return f'{y_pred:.2f}% interest rate predicted for 36 month Lending Club loan'

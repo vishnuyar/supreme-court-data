@@ -90,40 +90,40 @@ state_dict = {
 court_dict = {
     
         -1: 'Not Applicable',
-        48: 'California Central U.S. District Court',
-        50: 'California Northern U.S. District Court',
-        51: 'California Southern U.S. District Court',
-        55: 'District Of Columbia U.S. District Court',
-        58: 'Florida Southern U.S. District Court',
-        66: 'Illinois Northern U.S. District Court',
-        75: 'Louisiana Eastern U.S. District Court',
-        80: 'Massachusetts U.S. District Court',
-        81: 'Michigan Eastern U.S. District Court',
-        92: 'New Jersey U.S. District Court',
-        94: 'New York Eastern U.S. District Court',
-        96: 'New York Southern U.S. District Court',
-        109: 'Pennsylvania Eastern U.S. District Court',
-        301: 'State Appellate Court',
-        300: 'State Supreme Court',
-        302: 'State Trial Court',
-        121: 'Texas Southern U.S. District Court',
-        32: 'U.S. Court of Appeals, District of Columbia',
-        28: 'U.S. Court of Appeals, Eighth Circuit',
-        31: 'U.S. Court of Appeals, Eleventh Circuit',
-        8: 'U.S. Court of Appeals, Federal Circuit',
-        25: 'U.S. Court of Appeals, Fifth Circuit',
-        21: 'U.S. Court of Appeals, First Circuit',
-        24: 'U.S. Court of Appeals, Fourth Circuit',
-        29: 'U.S. Court of Appeals, Ninth Circuit',
-        22: 'U.S. Court of Appeals, Second Circuit',
-        27: 'U.S. Court of Appeals, Seventh Circuit',
-        26: 'U.S. Court of Appeals, Sixth Circuit',
-        30: 'U.S. Court of Appeals, Tenth Circuit',
-        23: 'U.S. Court of Appeals, Third Circuit',
-        3: 'U.S. Court of Claims, Court of Federal Claims',
-        9: 'U.S. Tax Court',
-        126: 'Virginia Eastern U.S. District Court',
-        9999:'Other Courts'
+        32: 'Appeals, District of Columbia',
+        28: 'Appeals, Eighth Circuit',
+        31: 'Appeals, Eleventh Circuit',
+        8:  'Appeals, Federal Circuit',
+        25: 'Appeals, Fifth Circuit',
+        21: 'Appeals, First Circuit',
+        24: 'Appeals, Fourth Circuit',
+        29: 'Appeals, Ninth Circuit',
+        22: 'Appeals, Second Circuit',
+        27: 'Appeals, Seventh Circuit',
+        26: 'Appeals, Sixth Circuit',
+        30: 'Appeals, Tenth Circuit',
+        23: 'Appeals, Third Circuit',
+        48: 'CA Central District Court',
+        50: 'CA Northern District Court',
+        51: 'CA Southern District Court',
+        3:  'Court of Federal Claims',
+        55: 'DC District Court',
+        58: 'Florida Southern District Court',
+        66: 'IL Northern District Court',
+        75: 'LA Eastern District Court',
+        80: 'MA District Court',
+        81: 'MI Eastern District Court',
+        92: 'NJ District Court',
+        94: 'NY Eastern District Court',
+        96: 'NY Southern District Court',
+        109:    'PA Eastern District Court',
+        301:    'State Appellate Court',
+        300:    'State Supreme Court',
+        302:    'State Trial Court',
+        121:    'TX Southern District Court',
+        9:  'U.S. Tax Court',
+        126:    'VA District Court',
+        9999:   'Other Courts'
                                 }
 
 lc_disposition_dict={1:'Stay Granted',
@@ -209,7 +209,7 @@ input_col = dbc.Col([
 
             Use the controls below to update your latest case status details.
         
-        """)
+        """),
     ]),
     dbc.Row([
         dbc.Col(
@@ -458,8 +458,8 @@ input_col = dbc.Col([
                 dcc.Markdown('###### Adminstraion action prior to litigation'), 
                 dcc.RadioItems(
                     id='is_adminAction', 
-                    options=[{'label': 'Not Applicable', 'value': 0},
-                    {'label': 'Federal Agency', 'value': 1},
+                    options=[{'label': 'Yes', 'value': 1},
+                    {'label': 'No', 'value': 0},
                     ], 
                     value=0
                 ),
@@ -489,9 +489,9 @@ input_col = dbc.Col([
         ),
                 ], style=style),
             ),
-    ])
+    ]),
 
-    ],md=7
+    ],md=7,
     )
 
 @app.callback(

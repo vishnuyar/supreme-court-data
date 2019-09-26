@@ -334,8 +334,9 @@ input_col = dbc.Col([
                     id='lcDisagreement',
                     options=[{'label': 'Yes', 'value': 1},
                             {'label': 'No', 'value': 0},],
-                    value=0
-                ),
+                    value=0,
+                    labelStyle={'margin-right': '20px'}
+                ), 
                 dbc.Tooltip(
                     "Dissent is applicable only when the Lower Court decision is not unanimous",
                 target="lcDisagreement",
@@ -413,7 +414,7 @@ input_col = dbc.Col([
     dbc.Row([
         dbc.Col(
             html.Div([
-                dcc.Markdown('###### Argument Completed'), 
+                dcc.Markdown('###### Argument Completed ?'), 
                 dcc.RadioItems(
                     id='case_argued',
                     options=[
@@ -421,7 +422,8 @@ input_col = dbc.Col([
                     {'label': 'No', 'value': 0},
 
                     ],
-                    value=0
+                    value=0,
+                    labelStyle={'margin-right': '20px'}
                 ), 
                 dbc.Tooltip(
                     "Select if Oral Arguments have been heard by the Supreme Court",
@@ -432,7 +434,7 @@ input_col = dbc.Col([
 
         dbc.Col(
             html.Div([
-                dcc.Markdown('###### Re Argument Completed'), 
+                dcc.Markdown('###### Re Argument Completed ?'), 
                 dcc.RadioItems(
                     id='case_reargued',
                     options=[
@@ -440,7 +442,8 @@ input_col = dbc.Col([
                     {'label': 'No', 'value': 0},
 
                     ],
-                    value=0
+                    value=0,
+                    labelStyle={'margin-right': '20px'}
                     ),
                  dbc.Tooltip(
                     "Rarely : Supreme Court asks Oral Arguments to be presented again.",
@@ -455,13 +458,14 @@ input_col = dbc.Col([
     dbc.Row([
         dbc.Col(
             html.Div([
-                dcc.Markdown('###### Adminstraion action prior to litigation'), 
+                dcc.Markdown('###### Adminstraion action prior to litigation ?'), 
                 dcc.RadioItems(
                     id='is_adminAction', 
                     options=[{'label': 'Yes', 'value': 1},
                     {'label': 'No', 'value': 0},
                     ], 
-                    value=0
+                    value=0,
+                    labelStyle={'margin-right': '20px'}
                 ),
                 dbc.Tooltip(
                     "Applicable only if there is Administrative activity prior"
@@ -473,7 +477,7 @@ input_col = dbc.Col([
         ),
         dbc.Col(
             html.Div([
-                dcc.Markdown('###### Three Judge Court'), 
+                dcc.Markdown('###### Three Judge Court ?'), 
                 dcc.RadioItems(
                     id='threeJudgeFdc',
                     options=[
@@ -481,7 +485,8 @@ input_col = dbc.Col([
                     {'label': 'No', 'value': 0},
 
                     ],
-                    value=0
+                    value=0,
+                    labelStyle={'margin-right': '20px'}
                     ),
                  dbc.Tooltip(
                     "Is the case being heard by Three Judge Court ?",

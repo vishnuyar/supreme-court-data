@@ -15,8 +15,8 @@ introduction = dbc.Row(
 
 
         The Supreme Court of the United States is the highest court in the United States of America.  It's decision has to be followed by all courts in the United States.  
-        They are 9 Justices in the Supreme Court who are appointed by the President.
-        The Supreme Court chooses which cases it will decide on. For the Supreme Court to decide a case, the case must be about federal law or be about the laws of more than one state. Cases must first be decided by a federal District Court and a federal Court of Appeals or by a state supreme court. Even after that, the Supreme Court can choose not to decide a case for any reason. There are some cases that can start in the Supreme Court and that the Supreme Court must decide, but those are usually rare.
+        They are 9 Justices in the Supreme Court who are appointed by the President.  The Supreme Court chooses
+         which cases it will decide on. For the Supreme Court to decide a case, the case must be about federal law or be about the laws of more than one state. Cases must first be decided by a federal District Court and a federal Court of Appeals or by a state supreme court. Even after that, the Supreme Court can choose not to decide a case for any reason. There are some cases that can start in the Supreme Court and that the Supreme Court must decide, but those are usually rare.
         """
      )]
 )
@@ -212,7 +212,7 @@ partialplot_writeup = dbc.Row(
     [
     dcc.Markdown(
     """
-        Looking at the partialplot for the features Issue Area and CertReason, we can see that, some specific values
+        Looking at the partialplot for the features **Issue Area** and **CertReason**, we can see that, some specific values
         increase the probability for the favorable outcome.  
 
 

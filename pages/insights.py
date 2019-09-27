@@ -80,19 +80,19 @@ state_dict = {
 court_dict = {
     
         -1: 'Not Applicable',
-        32: 'Appeals, District of Columbia',
-        28: 'Appeals, Eighth Circuit',
-        31: 'Appeals, Eleventh Circuit',
-        8:  'Appeals, Federal Circuit',
-        25: 'Appeals, Fifth Circuit',
-        21: 'Appeals, First Circuit',
-        24: 'Appeals, Fourth Circuit',
-        29: 'Appeals, Ninth Circuit',
-        22: 'Appeals, Second Circuit',
-        27: 'Appeals, Seventh Circuit',
-        26: 'Appeals, Sixth Circuit',
-        30: 'Appeals, Tenth Circuit',
-        23: 'Appeals, Third Circuit',
+        32: 'District of Columbia',
+        28: 'Eighth Circuit',
+        31: 'Eleventh Circuit',
+        8:  'Federal Circuit',
+        25: 'Fifth Circuit',
+        21: 'First Circuit',
+        24: 'Fourth Circuit',
+        29: 'Ninth Circuit',
+        22: 'Second Circuit',
+        27: 'Seventh Circuit',
+        26: 'Sixth Circuit',
+        30: 'Tenth Circuit',
+        23: 'Third Circuit',
         48: 'CA Central District Court',
         50: 'CA Northern District Court',
         51: 'CA Southern District Court',
@@ -135,13 +135,13 @@ judge_dict = {
         17: 'Roberts'
         }
 decision_dict = {
-        1:  'opinion of the court',
-        2:  'per curiam',
-        4:  'decrees',
-        5:  'equally divided vote',
-        6:  'orally argued',
-        7:  'judgment of the Court',
-        8:  'seriatim'
+        1:  'Opinion of the court',
+        2:  'Per curiam',
+        4:  'Decrees',
+        5:  'Equally divided vote',
+        6:  'Orally argued',
+        7:  'Judgment of the Court',
+        8:  'Seriatim'
 }
 
 lc_disposition_dict={1:'Stay Granted',
@@ -155,7 +155,8 @@ lc_disposition_dict={1:'Stay Granted',
                             9:'Appeal Dismissed',
                             10:'Modify',
                             11:'Remand',
-                            12:'Unusual decision'}
+                            12:'Unusual decision',
+                            -1:'Not Available'}
 
 cert_labels_dict={1: 'Cert not granted',
                      2: 'Federal court conflict',
@@ -169,7 +170,8 @@ cert_labels_dict={1: 'Cert not granted',
                      10: 'To resolve important question',
                      11: 'To resolve question presented',
                      12: 'No Reason Given',
-                     13: 'Other reason'}
+                     13: 'Other reason',
+                     -1: 'Not Available'}
 
 issue_areas_dict = {1: 'Criminal Procedure',
                      2: 'Civil Rights',
@@ -184,7 +186,8 @@ issue_areas_dict = {1: 'Criminal Procedure',
                      11: 'Interstate Relations',
                      12: 'Federal Taxation',
                      13: 'Miscellaneous',
-                     14: 'Private Action'}
+                     14: 'Private Action',
+                     -1: 'Not Available'}
 parties_category = {28: 'State Government',
                  27: 'United States',
                  100: 'Person accused of crime',
@@ -201,20 +204,20 @@ parties_category = {28: 'State Government',
                  195: 'Owner',
                  240: 'Taxpayer',
                  9999: 'Others'}
-jurisdiction_dict = {1: 'cert',
-                    2: 'appeal',
-                    3: 'bail',
-                    4: 'certification',
-                    5: 'docketing fee',
-                    6: 'rehearing ',
-                    7: 'injunction',
-                    8: 'mandamus',
-                    9: 'original',
-                    10: 'prohibition',
-                    12: 'stay',
-                    13: 'writ of error',
-                    14: 'writ of habeas corpus',
-                    15: 'unspecified, other' }
+jurisdiction_dict = {1: 'Cert',
+                    2: 'Appeal',
+                    3: 'Bail',
+                    4: 'Certification',
+                    5: 'Docketing fee',
+                    6: 'Rehearing ',
+                    7: 'Injunction',
+                    8: 'Mandamus',
+                    9: 'Original',
+                    10: 'Prohibition',
+                    12: 'Stay',
+                    13: 'Writ of error',
+                    14: 'Writ of habeas corpus',
+                    15: 'Unspecified' }
 
 #Loading the data from assets
 data = pd.read_csv('data/SCDB_2019_01_caseCentered_Citation.csv',encoding='ISO 8859-1')
@@ -264,9 +267,27 @@ data['partyWinning']=data['partyWinning'].map({0:'Lost',1:'Won'})
 data['decisionType']=data['decisionType'].map(decision_dict)
 data['caseDisposition']=data['caseDisposition'].map(lc_disposition_dict)
 
+background_variables_dict = {'petitioner':'Petitioner',
+                              'petitionerState':' Petitioner State',
+                              'respondent':'Respondent',
+                              'respondentState':'Respondent State',
+                              'jurisdiction':'Jurisdiction',
+                              'caseOrigin':'Case Origin',
+                              'caseOriginState':'Case Origin State',
+                              'caseSource':'Case Source',
+                              'caseSourceState':'Case Source State',
+                              'certReason':'Cert Reason',
+                              'lcDisposition':'Lower Court Decision',
+                              'issueArea':'Issue Area',
+                              'decisionType':'Decision Type',
+                              'caseDisposition':'Case Decision Type',
+                              'majVotes':'Majority Decision Votes'}
+
 background_variables=['petitioner', 'petitionerState', 'respondent', 'respondentState','jurisdiction', 
                       'caseOrigin', 'caseOriginState','caseSource', 'caseSourceState','certReason',
                        'lcDisposition','issueArea','decisionType','caseDisposition','majVotes']
+
+
 #available_indicators = df['Indicator Name'].unique()
 
 
@@ -275,7 +296,7 @@ layout = html.Div([
             html.H3('Viz Lab for Supreme Court Dataset',style={'text-align': 'center'}),
             dcc.Markdown(
                     '''
-                        Select a Case **feature** : To drill down, select the values in the second dropdown box.
+                        Select a Case **feature** : To drill down, select the values in the bottom dropdown box.
                         You can see the interaction of feautures to check the Win and Loss ratio of cases.
 
                     '''
@@ -290,74 +311,94 @@ layout = html.Div([
             #             labelStyle={'margin-right': '20px'}
             #         ),
             html.Div(children=[
+              
                 
                 dbc.Row([
-                                        
-                    dbc.Col(
+                    
+                      dbc.Col(
+                       html.Div([ 
+                        dcc.Markdown('###### Case Feature:'),
                         dcc.Dropdown(
                         id='firstvariable',
-                        options=[{'label': i, 'value': i} for i in background_variables],
+                        options=[{'label': background_variables_dict[key], 'value': key} for key in background_variables_dict],
                         value='petitioner'
-                    ),md=3),
+                    )
+                      ]),                 
+                    md=3),
                     dbc.Col(
-                    dcc.Dropdown(
+                      html.Div([
+                        dcc.Markdown('###### Case Feature:'),
+                        dcc.Dropdown(
                         id='secondvariable',
                         #options=[{'label': i, 'value': i} for i in background_variables],
                         value='respondent'
-                    ),md=3)
-                    ],style = {'padding': '1.5em'}),
+                    )
+                        ]),md=3)
+                    ],style = {'padding': '0.5em'}),
                 dbc.Row([
                 
-            dbc.Col(
-                dcc.Dropdown(
-                    id='firstvariablevalues',
-                    #options=[{'label': i, 'value': i} for i in vote_variables],
-                    value='all'
-                ),md=3),
-            dbc.Col(
-                dcc.Dropdown(
-                    id='secondvariablevalues',
-                    #options=[{'label': i, 'value': i} for i in vote_variables],
-                    value='all'
-                ),md=3)
-                  
-            ]),
-            dbc.Row(id='body',className='container scalable',children=[
+                  dbc.Col(
+                    html.Div([
+                      html.Div(id='firstvariable_name'),
+                      dcc.Dropdown(
+                          id='firstvariablevalues',
+                          #options=[{'label': i, 'value': i} for i in vote_variables],
+                          value='all'
+                      )
+                      ])
+                      ,md=3),
+                  dbc.Col(
+                    html.Div([
+                      html.Div(id='secondvariable_name'),
+                      dcc.Dropdown(
+                          id='secondvariablevalues',
+                          #options=[{'label': i, 'value': i} for i in vote_variables],
+                          value='all'
+                      )
+                      ])
+                      ,md=3)
+                        
+                  ]),
+                ]),
+            dbc.Row([
                 
                 dbc.Col(
-                dcc.Graph(id='result_pie-graphic')
+                dcc.Graph(id='result_pie-graphic'),md=8
                 ),
                 dbc.Col(
-                dcc.Graph(id='column_pie-graphic')
+                dcc.Graph(id='column_pie-graphic',style={'height':'100%'})
                 )
             ]),
             dbc.Row(
                  dcc.Graph(id='bar-graphic')
                 ),
 
-       ])
+       
 ])
 
 @app.callback(
-    Output('secondvariable','options'),
-    [Input('firstvariable','value')])
-def update_secondvariable(variablename):
-    #firstoption = [{'label':'Select All','value':'all'}]
-    return [{'label': i, 'value': i} for i in background_variables if (i!=variablename)]
-@app.callback(
+    [Output('firstvariable_name','children'),
     Output('firstvariablevalues','options'),
+     Output('secondvariable','options')],
     [Input('firstvariable','value')])
-def update_firstvariable(variablename):
+def update_variables(variablename):
+    firstvariable_name = background_variables_dict[variablename]+' values:'
+    firstvariablevalues = [{'label':'Select All','value':'all'}]+ [{'label':name,'value':name } for name in data[variablename].unique()]
+    secondvariable = [{'label': background_variables_dict[key], 'value': key} for key in background_variables_dict if key != variablename]
     #firstoption = [{'label':'Select All','value':'all'}]
-    return [{'label':'Select All','value':'all'}]+\
-        [{'label':name,'value':name } for name in data[variablename].unique()]
+    return firstvariable_name,firstvariablevalues,secondvariable
+    
+    
+
 @app.callback(
-    Output('secondvariablevalues','options'),
+    [Output('secondvariable_name','children'),
+    Output('secondvariablevalues','options')],
     [Input('secondvariable','value')])
 def update_firstvariable(variablename):
-    #firstoption = [{'label':'Select All','value':'all'}]
-    return [{'label':'Select All','value':'all'}]+\
-        [{'label':name,'value':name } for name in data[variablename].unique()]
+    secondvariable_name = background_variables_dict[variablename]+' values:'
+    secondvariablevalues = [{'label':'Select All','value':'all'}]+[{'label':name,'value':name } for name in data[variablename].unique()]
+    return secondvariable_name,secondvariablevalues
+    
 
        
 
@@ -381,7 +422,7 @@ def update_graph_all(firstvariable):#yaxis_column_name,
     losing_bar = go.Bar(y=losing_df['partyWinning'],x=winning_df[firstvariable],name='Lost')
     #print(bardata)
     return {'data': [winning_bar,losing_bar],
-            'layout':{'title':f'No of Cases by {firstvariable}'}}
+            'layout':{'title':f'No of Cases by {background_variables_dict[firstvariable]}'}}
 @app.callback(
     Output('column_pie-graphic', 'figure'),
     [Input('firstvariable', 'value'),
@@ -398,10 +439,10 @@ def update_column_pie(firstvariable): #yaxis_column_name,
     column_df = data.groupby([firstvariable])['partyWinning'].count().reset_index()
     #removing the values which are less than 1% of dataset
     column_df = column_df[column_df['partyWinning']>90]
-    column_pie = go.Pie(values=column_df['partyWinning'],hole=0.45,labels=column_df[firstvariable],
+    column_pie = go.Pie(values=column_df['partyWinning'],hole=0.55,labels=column_df[firstvariable],
         name='Break by Categories',showlegend=False,hoverinfo='label')
     #print(column_df)
-    return {'data': [column_pie],'layout':{'title':f'% of Cases by {firstvariable}'}}
+    return {'data': [column_pie],'layout':{'title':f'% of Cases by {background_variables_dict[firstvariable]}'}}
 
 @app.callback(
     Output('result_pie-graphic', 'figure'),
@@ -421,7 +462,8 @@ def update_graph(firstvariable,firstvariablevalues,secondvariable,secondvariable
     if((firstvariablevalues=='all') &(secondvariablevalues=='all')):
         result_data = year_data
         result_variable = firstvariable
-        titlevariable = firstvariable       
+        titlevariable = firstvariable 
+        variablevalues = 'All'      
     elif((firstvariablevalues=='all') &(secondvariablevalues!='all')):
        result_data = year_data[(year_data[secondvariable]==secondvariablevalues)][[firstvariable,'partyWinning']]
        result_variable = firstvariable
@@ -434,17 +476,24 @@ def update_graph(firstvariable,firstvariablevalues,secondvariable,secondvariable
         variablevalues = firstvariablevalues
     else:
         result_data = year_data[(year_data[firstvariable]==firstvariablevalues)&(year_data[secondvariable]==secondvariablevalues)]['partyWinning'].value_counts().reset_index()
+    #print(firstvariable,firstvariablevalues,secondvariable,secondvariablevalues)
     #print(result_data)
     if(result_variable!=None):
         losing_df = result_data[result_data['partyWinning']=='Lost'].groupby(result_variable)['partyWinning'].count().reset_index()
         winning_df = result_data[result_data['partyWinning']=='Won'].groupby(result_variable)['partyWinning'].count().reset_index()
-        winning_bar = go.Bar(y=winning_df['partyWinning'],x=winning_df[result_variable],name='Won')
-        losing_bar = go.Bar(y=losing_df['partyWinning'],x=winning_df[result_variable],name='Lost')
+        winning_bar = go.Bar(x=winning_df['partyWinning'],
+          y=winning_df[result_variable],name='Won',orientation='h')
+        losing_bar = go.Bar(x=losing_df['partyWinning'],
+          y=winning_df[result_variable],name='Lost',orientation='h')
         return {'data': [winning_bar,losing_bar],
-                'layout':{'title':f'Win/Loss Cases when {titlevariable} : {variablevalues}'}}
+                'layout':{'title':f'Win/Loss Cases for {background_variables_dict[titlevariable]} : {variablevalues}',
+                'colorway':["#287D95", "#EF533B"],
+                'xaxis':{'type':'log','title':'No. of Cases (Log Scale)'},'yaxis':{'tickangle':-50,'tickfont':{'size':11}}}
+                }
     else:
-        return {'data':[go.Pie(values=result_data['partyWinning'],labels=['Lost','Won'],hoverinfo=None)],
-            'layout':{'titlefont':{'size':10},'title':f'{firstvariable} : {firstvariablevalues} \n {secondvariable}: {secondvariablevalues}'}}
+        return {'data':[go.Pie(values=result_data['partyWinning'],labels=['Lost','Won'],hoverinfo='value')],
+            'layout':{'titlefont':{'size':15},
+            'title':f'{background_variables_dict[firstvariable]} : {firstvariablevalues} \n {background_variables_dict[secondvariable]}: {secondvariablevalues}'}}
 
 
     

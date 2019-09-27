@@ -422,7 +422,8 @@ def update_graph_all(firstvariable):#yaxis_column_name,
     losing_bar = go.Bar(y=losing_df['partyWinning'],x=winning_df[firstvariable],name='Lost')
     #print(bardata)
     return {'data': [winning_bar,losing_bar],
-            'layout':{'title':f'No of Cases by {background_variables_dict[firstvariable]}'}}
+            'layout':{'title':f'No of Cases by {background_variables_dict[firstvariable]}',
+              'titlefont':{'size':18,'color':'#287D95','family':'Raleway'}}}
 @app.callback(
     Output('column_pie-graphic', 'figure'),
     [Input('firstvariable', 'value'),
@@ -442,7 +443,8 @@ def update_column_pie(firstvariable): #yaxis_column_name,
     column_pie = go.Pie(values=column_df['partyWinning'],hole=0.55,labels=column_df[firstvariable],
         name='Break by Categories',showlegend=False,hoverinfo='label')
     #print(column_df)
-    return {'data': [column_pie],'layout':{'title':f'% of Cases by {background_variables_dict[firstvariable]}'}}
+    return {'data': [column_pie],'layout':{'title':f'% of Cases by {background_variables_dict[firstvariable]}',
+              'titlefont':{'size':18,'color':'#287D95','family':'Raleway'}}}
 
 @app.callback(
     Output('result_pie-graphic', 'figure'),
@@ -488,11 +490,12 @@ def update_graph(firstvariable,firstvariablevalues,secondvariable,secondvariable
         return {'data': [winning_bar,losing_bar],
                 'layout':{'title':f'Win/Loss Cases for {background_variables_dict[titlevariable]} : {variablevalues}',
                 'colorway':["#287D95", "#EF533B"],
+                'titlefont':{'size':18,'color':'#287D95','family':'Raleway'},
                 'xaxis':{'type':'log','title':'No. of Cases (Log Scale)'},'yaxis':{'tickangle':-50,'tickfont':{'size':11}}}
                 }
     else:
         return {'data':[go.Pie(values=result_data['partyWinning'],labels=['Lost','Won'],hoverinfo='value')],
-            'layout':{'titlefont':{'size':15},
+            'layout':{'titlefont':{'size':15,'color':'#287D95','family':'Raleway'},
             'title':f'{background_variables_dict[firstvariable]} : {firstvariablevalues} \n {background_variables_dict[secondvariable]}: {secondvariablevalues}'}}
 
 

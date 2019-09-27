@@ -570,11 +570,12 @@ def send_piechart(threeJudgeFdc,petitioner, case_argued, lcDisposition, responde
     favorable_outcome = 100*y_proba
     unfavorable_outcome = 100 - favorable_outcome
     colors=['ForestGreen','Crimson']
-    graphdata = go.Pie(values=[favorable_outcome,unfavorable_outcome],
-        labels=['Favorable','Unfavorable'],
-        marker=dict(colors=colors, line=dict(color='#000000', width=1)),
-        title=('Outcome Probability'))
-    return {'data': [graphdata]}
+    graphdata = go.Pie(values=[favorable_outcome,unfavorable_outcome],labels=['Favorable','Unfavorable'],
+        # labels=['Favorable','Unfavorable'],
+        marker=dict(colors=colors, line=dict(color='#000000', width=1)))
+        # title=('Outcome Probability'))
+    return {'data': [graphdata],'layout':{'titlefont':{'size':24,'color':'#287D95','family':'Raleway'},
+       'title':'Case Outcome Probability'}}
     
 
 layout = dbc.Row([

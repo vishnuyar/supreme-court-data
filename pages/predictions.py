@@ -221,7 +221,7 @@ input_col = dbc.Col([
                 value=1
                 ),
                 dbc.Tooltip(
-                        "Select the reason Supreme Court gives to grant the petition",
+                        "Reason give by Supreme Court to grant the petition",
             target="certReason",
         ), 
             ], style=style),
@@ -236,7 +236,7 @@ input_col = dbc.Col([
                     value=1
                 ),
                 dbc.Tooltip(
-                        "Select the Issue area, this case comes under",
+                        "Issue area of this case",
             target="issueArea",
         ), 
             ], style=style),
@@ -270,7 +270,7 @@ input_col = dbc.Col([
                     value=-1
                 ),
                 dbc.Tooltip(
-                    "The State petitioner belongs to: Not Applicable if US Govt is the petitioner",
+                    "State of the Petitioner: Not Applicable if US Govt is the Petitioner",
                 target="petitionerState",
         ), 
             ], style=style),
@@ -288,7 +288,7 @@ input_col = dbc.Col([
                     value=28
                 ), 
                 dbc.Tooltip(
-                    "The party against whom the petition has been filed by the Petitioner",
+                    "Party against whom the petition has been filed by the Petitioner",
                 target="respondent",
         ),
             ], style=style),
@@ -303,7 +303,7 @@ input_col = dbc.Col([
                     value=-1
                 ),
                 dbc.Tooltip(
-                    "The State respondent belongs to: Not Applicable if US Govt is the respondent",
+                    "State of the Respondent: Not Applicable if US Govt is the Respondent",
                 target="respondentState",
         ), 
             ], style=style),
@@ -321,7 +321,7 @@ input_col = dbc.Col([
                     value=1
                 ),
                 dbc.Tooltip(
-                    "Lower Court Decision : The decision which the Petitioner has approached the Supreme Court to review",
+                    "Decision which the Petitioner has approached the Supreme Court to review",
                 target="lcDisposition",
         ),
 
@@ -356,7 +356,7 @@ input_col = dbc.Col([
                     value=28
                 ),
                 dbc.Tooltip(
-                    "The name of the Lower Court",
+                    "Name of the Lower Court whose decision is being reviewed by the Supreme Court",
                 target="caseSource",
         ), 
             ], style=style),
@@ -403,7 +403,7 @@ input_col = dbc.Col([
                     value=-1
                 ),
                 dbc.Tooltip(
-                    "Applicable : only when the case Origin Court is a State Court",
+                    "Applicable : only when the Case Origin Court is a State Court",
                 target="caseOriginState",
         ), 
             ], style=style),

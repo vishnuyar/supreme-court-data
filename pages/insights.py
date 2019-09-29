@@ -281,7 +281,8 @@ background_variables_dict = {'petitioner':'Petitioner',
                               'issueArea':'Issue Area',
                               'decisionType':'Decision Type',
                               'caseDisposition':'Case Decision Type',
-                              'majVotes':'Majority Decision Votes'}
+                              'majVotes':'Majority Decision Votes'
+                              }
 
 background_variables=['petitioner', 'petitionerState', 'respondent', 'respondentState','jurisdiction', 
                       'caseOrigin', 'caseOriginState','caseSource', 'caseSourceState','certReason',
@@ -317,21 +318,34 @@ layout = html.Div([
                     
                       dbc.Col(
                        html.Div([ 
-                        dcc.Markdown('###### Case Feature:'),
+                        dcc.Markdown('###### Case Feature: (Grouping)'),
                         dcc.Dropdown(
-                        id='firstvariable',
+                        id='group_variable',
                         options=[{'label': background_variables_dict[key], 'value': key} for key in background_variables_dict],
-                        value='petitioner'
+                        value='petitioner',
+                        clearable=False
                     )
                       ]),                 
                     md=3),
                     dbc.Col(
                       html.Div([
-                        dcc.Markdown('###### Case Feature:'),
+                        dcc.Markdown('###### Case Feature:(List)'),
                         dcc.Dropdown(
-                        id='secondvariable',
-                        #options=[{'label': i, 'value': i} for i in background_variables],
-                        value='respondent'
+                        id='drill_variable',
+                        clearable=False,
+                        disabled=True
+                    )
+                        ]),md=3),
+                       dbc.Col(
+                      html.Div([
+                        dcc.Markdown('###### Supreme Court Term:'),
+                        dcc.RadioItems(
+                        id='timevariable',
+                        options=[{'label': 'All', 'value': 'All'},
+                            {'label': 'Decades', 'value': 'Decade'},
+                            {'label': 'Year', 'value': 'Year'}],
+                        value='All',
+                        labelStyle={'margin-right': '20px'}
                     )
                         ]),md=3)
                     ],style = {'padding': '0.5em'}),
@@ -339,21 +353,31 @@ layout = html.Div([
                 
                   dbc.Col(
                     html.Div([
-                      html.Div(id='firstvariable_name'),
+                      html.Div(id='group_variable_name'),
                       dcc.Dropdown(
-                          id='firstvariablevalues',
-                          #options=[{'label': i, 'value': i} for i in vote_variables],
-                          value='all'
+                          id='group_variablevalues',
+                          value='all',
+                          clearable=False
                       )
                       ])
                       ,md=3),
                   dbc.Col(
                     html.Div([
-                      html.Div(id='secondvariable_name'),
+                      html.Div(id='drill_variable_name'),
                       dcc.Dropdown(
-                          id='secondvariablevalues',
-                          #options=[{'label': i, 'value': i} for i in vote_variables],
-                          value='all'
+                        id='drill_variablevalues',
+                        clearable=False,
+                        disabled=True
+                      )
+                      ])
+                      ,md=3),
+                  dbc.Col(
+                    html.Div([
+                      html.Div(id='timevariable_name'),
+                      dcc.Dropdown(
+                          id='timevariablevalues',
+                          multi=True,
+                          clearable=False
                       )
                       ])
                       ,md=3)
@@ -363,141 +387,181 @@ layout = html.Div([
             dbc.Row([
                 
                 dbc.Col(
-                dcc.Graph(id='result_pie-graphic'),md=8
+                dcc.Graph(id='bar-graph'),md=7
                 ),
                 dbc.Col(
-                dcc.Graph(id='column_pie-graphic',style={'height':'100%'})
+                dcc.Graph(id='pie-chart',style={'height':'100%'})
                 )
             ]),
-            dbc.Row(
-                 dcc.Graph(id='bar-graphic')
-                ),
-
+            
        
 ])
 
+#Callback for getting the Unique values for the Group Feature
 @app.callback(
-    [Output('firstvariable_name','children'),
-    Output('firstvariablevalues','options'),
-     Output('secondvariable','options')],
-    [Input('firstvariable','value')])
-def update_variables(variablename):
-    firstvariable_name = background_variables_dict[variablename]+' values:'
-    firstvariablevalues = [{'label':'Select All','value':'all'}]+ [{'label':name,'value':name } for name in data[variablename].unique()]
-    secondvariable = [{'label': background_variables_dict[key], 'value': key} for key in background_variables_dict if key != variablename]
-    #firstoption = [{'label':'Select All','value':'all'}]
-    return firstvariable_name,firstvariablevalues,secondvariable
-    
-    
-
+    [Output('group_variable_name','children'),
+    Output('group_variablevalues','options'),
+    Output('group_variablevalues','value')],
+    [Input('group_variable','value')])
+def update_groupvariable_values(groupvariable):
+    group_variable_name = background_variables_dict[groupvariable]+' values:'
+    group_variablevalues = [{'label':'Select All','value':'all'}]+ [{'label':name,'value':name } for name in data[groupvariable].unique()]
+    return group_variable_name,group_variablevalues,'all'
+#Callback for List features only if a value is selected in the Group Feature
 @app.callback(
-    [Output('secondvariable_name','children'),
-    Output('secondvariablevalues','options')],
-    [Input('secondvariable','value')])
-def update_firstvariable(variablename):
-    secondvariable_name = background_variables_dict[variablename]+' values:'
-    secondvariablevalues = [{'label':'Select All','value':'all'}]+[{'label':name,'value':name } for name in data[variablename].unique()]
-    return secondvariable_name,secondvariablevalues
+    [Output('drill_variable','disabled'),
+     Output('drill_variable','options'),
+     Output('drill_variable','value')],
+    [Input('group_variablevalues','value'),
+    Input('group_variable','value')])
+def update_drill_variable(selected_groupvalue,group_variable):
+  if(selected_groupvalue!='all'):
+    drill_variable = [{'label': background_variables_dict[key], 'value': key} for key in background_variables_dict if key != group_variable]
+    drill_variable_defaultvalue = drill_variable[3]['value']
+    return False,drill_variable,drill_variable_defaultvalue
+  else:
+    return True,[],None
+  
     
+    
+#Callback for updating Unique values for the Drill Feature selected
+@app.callback(
+    [Output('drill_variablevalues','disabled'),
+    Output('drill_variable_name','children'),
+    Output('drill_variablevalues','options'),
+    Output('drill_variablevalues','value')],
+    [Input('drill_variable','value'),
+    Input('drill_variable','disabled')])
+def update_drillvariable_values(variablename,drill_variable_disable):
+    if(drill_variable_disable):
+      return True,None,[],None    
+    else:
+      drill_variable_name = 'Select '+background_variables_dict[variablename]+':'
+      drill_variablevalues = [{'label':'Select All','value':'all'}]+[{'label':name,'value':name } for name in data[variablename].unique()]
+      return False,drill_variable_name,drill_variablevalues,'all'
 
+#Callback for updating the Supreme Courts Terms as per the User choice selected     
+@app.callback(
+    [Output('timevariable_name','children'),
+    Output('timevariablevalues','options'),
+    Output('timevariablevalues','value')],
+    [Input('timevariable','value')])
+def update_timevariable(variablename):
+  minyear = data['term'].min()
+  maxyear = data['term'].max()
+  
+  mindecade = ((minyear//10)-1)*10
+  maxdecade = ((maxyear//10))*10
+  if(variablename=='All'):
+    timevariable_name = 'Selected All Years:'
+    timevariablevalues = [{'label':'All Years','value':'All'}]
+    time_defaultvalue = ['All']
+  elif(variablename=='Decade'):
+    timevariable_name = 'Select Decade:'
+    timevariablevalues = [{'label':str(decade)+'-'+str(decade%100+9),'value':decade } for decade in range(maxdecade,mindecade,-10)]
+    time_defaultvalue = [maxdecade]
+  else:
+    timevariable_name = 'Select Year:'
+    timevariablevalues = [{'label':year,'value':year } for year in range(maxyear,minyear,-1)]
+    time_defaultvalue = [maxyear]
+  return timevariable_name,timevariablevalues,time_defaultvalue
        
 
 
+#Creating a Pie Chart by the Grouped feature and a bar chart for Grouped feature with Drill Feature
+#Instead of bar chart, a pie chart will be created if a specific groupvalue and drill value is selected
 @app.callback(
-    Output('bar-graphic', 'figure'),
-    [Input('firstvariable', 'value'),
-     #Input('yaxis-column', 'value'),
-     # Input('xaxis-type', 'value'),
-     # Input('yaxis-type', 'value'),
-     #Input('term', 'value')
+    [Output('bar-graph', 'figure'),
+    Output('pie-chart', 'figure')],
+    [Input('group_variable', 'value'),
+     Input('group_variablevalues', 'value'),
+     Input('drill_variable', 'value'),
+     Input('drill_variablevalues', 'value'),
+     Input('timevariable', 'value'),
+     Input('timevariablevalues', 'value')
      ])
-def update_graph_all(firstvariable):#yaxis_column_name,
-                 #xaxis_type, yaxis_type,
-                 #year_values):
-    year_values = [year for year in data['term'].unique()]
-    #print(data['chief'].unique())
-    winning_df = data[(data['partyWinning']=='Won')].groupby([firstvariable])['partyWinning'].count().reset_index()
-    losing_df = data[(data['partyWinning']=='Lost')].groupby([firstvariable])['partyWinning'].count().reset_index()
-    winning_bar = go.Bar(y=winning_df['partyWinning'],x=winning_df[firstvariable],name='Won')
-    losing_bar = go.Bar(y=losing_df['partyWinning'],x=winning_df[firstvariable],name='Lost')
-    #print(bardata)
-    return {'data': [winning_bar,losing_bar],
-            'layout':{'title':f'No of Cases by {background_variables_dict[firstvariable]}',
-              'titlefont':{'size':18,'color':'#287D95','family':'Raleway'}}}
-@app.callback(
-    Output('column_pie-graphic', 'figure'),
-    [Input('firstvariable', 'value'),
-     #Input('yaxis-column', 'value'),
-     # Input('xaxis-type', 'value'),
-     # Input('yaxis-type', 'value'),
-     #Input('term', 'value')
-     ])
-def update_column_pie(firstvariable): #yaxis_column_name,
-                 #xaxis_type, yaxis_type,
-                 #year_values):
-
-    year_values = [year for year in data['term'].unique()]
-    column_df = data.groupby([firstvariable])['partyWinning'].count().reset_index()
-    #removing the values which are less than 1% of dataset
-    column_df = column_df[column_df['partyWinning']>90]
-    column_pie = go.Pie(values=column_df['partyWinning'],hole=0.55,labels=column_df[firstvariable],
-        name='Break by Categories',showlegend=False,hoverinfo='label')
-    #print(column_df)
-    return {'data': [column_pie],'layout':{'title':f'% of Cases by {background_variables_dict[firstvariable]}',
-              'titlefont':{'size':18,'color':'#287D95','family':'Raleway'}}}
-
-@app.callback(
-    Output('result_pie-graphic', 'figure'),
-    [Input('firstvariable', 'value'),
-     Input('firstvariablevalues', 'value'),
-     Input('secondvariable', 'value'),
-     Input('secondvariablevalues', 'value'),
-     #Input('term', 'value')
-     ])
-def update_graph(firstvariable,firstvariablevalues,secondvariable,secondvariablevalues):
-                 #year_values):
-    year_values = [year for year in data['term'].unique()]
-    year_data = data
+def update_graph(group_variable,group_variablevalues,drill_variable,drill_variablevalues,
+                 timevariable,timevariablevalues):
+    #Initialise variables
     result_variable=None
+    result_data = None
     variablevalues= ''
     titlevariable = ''
-    if((firstvariablevalues=='all') &(secondvariablevalues=='all')):
-        result_data = year_data
-        result_variable = firstvariable
-        titlevariable = firstvariable 
-        variablevalues = 'All'      
-    elif((firstvariablevalues=='all') &(secondvariablevalues!='all')):
-       result_data = year_data[(year_data[secondvariable]==secondvariablevalues)][[firstvariable,'partyWinning']]
-       result_variable = firstvariable
-       titlevariable = secondvariable
-       variablevalues = secondvariablevalues
-    elif((firstvariablevalues!='all') &(secondvariablevalues=='all')):
-        result_data = year_data[(year_data[firstvariable]==firstvariablevalues)][[secondvariable,'partyWinning']]
-        result_variable = secondvariable
-        titlevariable = firstvariable
-        variablevalues = firstvariablevalues
+    create_pie = False
+    bar_graph = {}
+    pie_chart ={}
+    second_title = ' '
+    all_years = [year for year in data['term'].unique()]
+    year_values = all_years
+    #For create a data which consists of cases belonging to the time feature selected
+    if(timevariable=='All'):
+      year_values = all_years
+      
+    elif(timevariable=='Decade'):
+      
+      for decade in timevariablevalues:
+        #Avoiding dash bug , where previous radio object value is sent for first time
+        if(decade !='All'):
+          year_values=[term for term in all_years if ((term >= decade )& (term <=(decade+9)))]
     else:
-        result_data = year_data[(year_data[firstvariable]==firstvariablevalues)&(year_data[secondvariable]==secondvariablevalues)]['partyWinning'].value_counts().reset_index()
-    #print(firstvariable,firstvariablevalues,secondvariable,secondvariablevalues)
-    #print(result_data)
+      year_values=timevariablevalues
+    
+    year_data = data[data['term'].isin(year_values)]
+
+    #Preparting Pie Chart
+    onepercent= year_data.shape[0]*0.01
+    column_df = year_data.groupby([group_variable])['partyWinning'].count().reset_index()
+    #removing the values which are less than 1% of dataset
+    column_df = column_df[column_df['partyWinning']>onepercent]
+    column_pie = go.Pie(values=column_df['partyWinning'],hole=0.55,labels=column_df[group_variable],
+        name='Break by Categories',showlegend=False,hoverinfo='label+value')
+    
+    pie_chart = {'data': [column_pie],
+      'layout':{'title':f'% of Cases by {background_variables_dict[group_variable]} , Time: '+str(timevariable),
+              'titlefont':{'size':18,'color':'#287D95','family':'Raleway'}}}
+    #preparing Bar Graphs
+    #As per conditions selected by the User
+    if((group_variablevalues=='all')):
+        
+        result_data = year_data
+        result_variable = group_variable
+        titlevariable = group_variable 
+        variablevalues = 'All'      
+    elif((group_variablevalues!='all') &(drill_variablevalues=='all')):
+        
+        second_title = background_variables_dict[drill_variable]
+        result_data = year_data[(year_data[group_variable]==group_variablevalues)][[drill_variable,'partyWinning']]
+        result_variable = drill_variable
+        titlevariable = group_variable
+        variablevalues = group_variablevalues
+    else:
+        
+        if(drill_variablevalues!=None):
+          
+          create_pie =True
+          result_data = year_data[(year_data[group_variable]==group_variablevalues)&(year_data[drill_variable]==drill_variablevalues)]['partyWinning'].value_counts().reset_index()
+    
     if(result_variable!=None):
+        
         losing_df = result_data[result_data['partyWinning']=='Lost'].groupby(result_variable)['partyWinning'].count().reset_index()
         winning_df = result_data[result_data['partyWinning']=='Won'].groupby(result_variable)['partyWinning'].count().reset_index()
         winning_bar = go.Bar(x=winning_df['partyWinning'],
           y=winning_df[result_variable],name='Won',orientation='h')
         losing_bar = go.Bar(x=losing_df['partyWinning'],
           y=winning_df[result_variable],name='Lost',orientation='h')
-        return {'data': [winning_bar,losing_bar],
-                'layout':{'title':f'Win/Loss Cases for {background_variables_dict[titlevariable]} : {variablevalues}',
+        bar_graph = {'data': [winning_bar,losing_bar],
+                'layout':{'title':f'Win/Loss Cases: {second_title} for [ {background_variables_dict[titlevariable]} : {variablevalues} ]',
                 'colorway':["#287D95", "#EF533B"],
+                'textposition':'inside',
+                'type':'stack',
                 'titlefont':{'size':18,'color':'#287D95','family':'Raleway'},
                 'xaxis':{'type':'log','title':'No. of Cases (Log Scale)'},'yaxis':{'tickangle':-50,'tickfont':{'size':11}}}
                 }
     else:
-        return {'data':[go.Pie(values=result_data['partyWinning'],labels=['Lost','Won'],hoverinfo='value')],
+      if(create_pie):
+        bar_graph = {'data':[go.Pie(values=result_data['partyWinning'],labels=['Lost','Won'],hoverinfo='value')],
             'layout':{'titlefont':{'size':15,'color':'#287D95','family':'Raleway'},
-            'title':f'{background_variables_dict[firstvariable]} : {firstvariablevalues} \n {background_variables_dict[secondvariable]}: {secondvariablevalues}'}}
-
+            'title':f'{background_variables_dict[group_variable]} : {group_variablevalues} \n {background_variables_dict[drill_variable]}: {drill_variablevalues}'}}
+    return bar_graph,pie_chart
 
     
-#layout = [container1,container2]

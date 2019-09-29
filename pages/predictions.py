@@ -218,7 +218,8 @@ input_col = dbc.Col([
                 dcc.Dropdown(
                 id='certReason', 
                 options=[{'label': cert_labels_dict[key], 'value': key} for key in cert_labels_dict], 
-                value=1
+                value=1,
+                clearable=False
                 ),
                 dbc.Tooltip(
                         "Reason give by Supreme Court to grant the petition",
@@ -233,7 +234,8 @@ input_col = dbc.Col([
                 dcc.Dropdown(
                     id='issueArea', 
                     options=[{'label': issue_areas_dict[key], 'value': key} for key in issue_areas_dict], 
-                    value=1
+                    value=1,
+                    clearable=False
                 ),
                 dbc.Tooltip(
                         "Issue area of this case",
@@ -252,7 +254,8 @@ input_col = dbc.Col([
                 dcc.Dropdown(
                     id='petitioner', 
                     options=[{'label': parties_category[key], 'value': key} for key in parties_category], 
-                    value=27
+                    value=27,
+                    clearable=False
                 ),
                 dbc.Tooltip(
                     "Petitoner: The one who approaches the Supreme Court",
@@ -267,7 +270,8 @@ input_col = dbc.Col([
                 dcc.Dropdown(
                     id='petitionerState', 
                     options=[{'label': state_dict[key], 'value': key} for key in state_dict], 
-                    value=-1
+                    value=-1,
+                    clearable=False
                 ),
                 dbc.Tooltip(
                     "State of the Petitioner: Not Applicable if US Govt is the Petitioner",
@@ -285,7 +289,8 @@ input_col = dbc.Col([
                 dcc.Dropdown(
                     id='respondent', 
                     options=[{'label': parties_category[key], 'value': key} for key in parties_category], 
-                    value=28
+                    value=28,
+                    clearable=False
                 ), 
                 dbc.Tooltip(
                     "Party against whom the petition has been filed by the Petitioner",
@@ -300,7 +305,8 @@ input_col = dbc.Col([
                 dcc.Dropdown(
                     id='respondentState', 
                     options=[{'label': state_dict[key], 'value': key} for key in state_dict], 
-                    value=-1
+                    value=-1,
+                    clearable=False
                 ),
                 dbc.Tooltip(
                     "State of the Respondent: Not Applicable if US Govt is the Respondent",
@@ -318,7 +324,8 @@ input_col = dbc.Col([
                 dcc.Dropdown(
                     id='lcDisposition', 
                     options=[{'label': lc_disposition_dict[key], 'value': key} for key in lc_disposition_dict], 
-                    value=1
+                    value=1,
+                    clearable=False
                 ),
                 dbc.Tooltip(
                     "Decision which the Petitioner has approached the Supreme Court to review",
@@ -353,7 +360,8 @@ input_col = dbc.Col([
                 dcc.Dropdown(
                     id='caseSource', 
                     options=[{'label': court_dict[key], 'value': key} for key in court_dict], 
-                    value=28
+                    value=28,
+                    clearable=False
                 ),
                 dbc.Tooltip(
                     "Name of the Lower Court whose decision is being reviewed by the Supreme Court",
@@ -368,7 +376,8 @@ input_col = dbc.Col([
                 dcc.Dropdown(
                     id='caseSourceState', 
                     options=[{'label': state_dict[key], 'value': key} for key in state_dict], 
-                    value=-1
+                    value=-1,
+                    clearable=False
                 ),
                 dbc.Tooltip(
                     "Applicable : only when the Lower Court is a State Court",
@@ -385,7 +394,8 @@ input_col = dbc.Col([
                 dcc.Dropdown(
                     id='caseOrigin', 
                     options=[{'label': court_dict[key], 'value': key} for key in court_dict], 
-                    value=28
+                    value=28,
+                    clearable=False
                 ), 
                 dbc.Tooltip(
                     "Court in which the case originated, Not Trial Court either a state or federal appellate court",
@@ -400,7 +410,8 @@ input_col = dbc.Col([
                 dcc.Dropdown(
                     id='caseOriginState', 
                     options=[{'label': state_dict[key], 'value': key} for key in state_dict], 
-                    value=-1
+                    value=-1,
+                    clearable=False
                 ),
                 dbc.Tooltip(
                     "Applicable : only when the Case Origin Court is a State Court",

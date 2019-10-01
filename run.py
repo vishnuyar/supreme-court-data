@@ -12,8 +12,8 @@ from pages import index, predictions, insights, process
 """
 https://dash-bootstrap-components.opensource.faculty.ai/l/components/navbar
 
-NavbarSimple consists of a 'brand' on the left, to which you can attach a link 
-with brand_href, and a number nav items as its children. NavbarSimple will 
+NavbarSimple consists of a 'brand' on the left, to which you can attach a link
+with brand_href, and a number nav items as its children. NavbarSimple will
 collapse on smaller screens, and add a toggle for revealing navigation items.
 
 brand (string, optional): Brand text, to go top left of the navbar.
@@ -27,57 +27,78 @@ sticky (string, optional): Stick the navbar to the top or the bottom of the view
 
 navbar = dbc.NavbarSimple(
     brand='Supreme Predictor',
-    brand_href='/', 
+    brand_href='/',
     children=[
-        dbc.NavItem(dcc.Link('Home', href='/', className='nav-link')),
-        dbc.NavItem(dcc.Link('Predictions', href='/predictions', className='nav-link')), 
-        dbc.NavItem(dcc.Link('DataViz', href='/insights', className='nav-link')), 
-        dbc.NavItem(dcc.Link('Process', href='/process', className='nav-link')) 
-        
-    ],
+        dbc.NavItem(
+            dcc.Link(
+                'Home',
+                href='/',
+                className='nav-link')),
+        dbc.NavItem(
+            dcc.Link(
+                'Predictions',
+                href='/predictions',
+                className='nav-link')),
+        dbc.NavItem(
+            dcc.Link(
+                'DataViz',
+                href='/insights',
+                className='nav-link')),
+        dbc.NavItem(
+            dcc.Link(
+                'Process',
+                href='/process',
+                className='nav-link'))],
     sticky='top',
-    color='#333', 
-    light=False, 
-    dark=True
-)
+    color='#333',
+    light=False,
+    dark=True)
 
 footer = dbc.Container(
     [
-    dbc.Row(
-        dbc.Col(
-            html.P(
-                [
-                    html.Span('Vishnu Yarmaneni', className='mr-2'), 
-                    html.A(html.I(className='fas fa-envelope-square mr-1'), href='mailto:vardhanvishnu@gmail.com'), 
-                    html.A(html.I(className='fab fa-github-square mr-1'), href='https://github.com/vishnuyar/supreme-court-data'), 
-                    html.A(html.I(className='fab fa-linkedin mr-1'), href='https://www.linkedin.com/in/vishnuvyarmaneni/'), 
-                    html.A(html.I(className='fab fa-twitter-square mr-1'), href='https://twitter.com/yarmaneni'), 
-                ], 
-                className='lead'
-             )
-            )
-        ), 
+        dbc.Row(
+            dbc.Col(
+                html.P(
+                    [
+                        html.Span(
+                            'Vishnu Yarmaneni',
+                            className='mr-2'),
+                        html.A(
+                            html.I(
+                                className='fas fa-envelope-square mr-1'),
+                            href='mailto:vardhanvishnu@gmail.com'),
+                        html.A(
+                            html.I(
+                                className='fab fa-github-square mr-1'),
+                            href='https://github.com/vishnuyar/supreme-court-data'),
+                        html.A(
+                            html.I(
+                                className='fab fa-linkedin mr-1'),
+                            href='https://www.linkedin.com/in/vishnuvyarmaneni/'),
+                        html.A(
+                            html.I(
+                                className='fab fa-twitter-square mr-1'),
+                            href='https://twitter.com/yarmaneni'),
+                    ],
+                    className='lead'))),
         dbc.Row(
             dcc.Markdown("""
-            
+
             ** Citation:**
             Harold J. Spaeth, Lee Epstein, et al. 2019 Supreme Court Database, Version 2019 Release 1. URL: http://Supremecourtdatabase.org
 
-                
-            """)
-        )
-    ]
-)
 
-# For more explanation, see: 
+            """))])
+
+# For more explanation, see:
 # Plotly Dash User Guide, URL Routing and Multiple Apps
 # https://dash.plot.ly/urls
 
 app.layout = html.Div([
-    dcc.Location(id='url', refresh=False), 
-    navbar, 
-    dbc.Container(id='page-content', className='mt-4'), 
-    html.Hr(), 
+    dcc.Location(id='url', refresh=False),
+    navbar,
+    dbc.Container(id='page-content', className='mt-4'),
+    html.Hr(),
     footer
 ])
 
@@ -94,6 +115,7 @@ def display_page(pathname):
         return process.layout
     else:
         return dcc.Markdown('## Page not found')
+
 
 if __name__ == '__main__':
     app.run_server(debug=True)
